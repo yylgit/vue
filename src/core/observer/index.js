@@ -154,7 +154,10 @@ export function defineReactive (
       const value = getter ? getter.call(obj) : val
       if (Dep.target) {
         dep.depend()
+        //如果有子observe，子observe的dep中也加入到父元素的watch中，
+        //子observe的dep update的时候，也会触发父元素的watch
         if (childOb) {
+          
           childOb.dep.depend()
         }
         if (Array.isArray(value)) {

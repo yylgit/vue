@@ -178,6 +178,9 @@ function initComputed (vm: Component, computed: Object) {
         getter = noop
       }
     }
+    //给每一个计算属性生成一个内部的watcher，一个是依赖的data变化时可以更新计算属性的值，
+    //第二是可以收集计算属性所有依赖的data的dep对象，在计算属性的getter函数里，将计算属性
+    //的外层watcher也都订阅在内层的data的dep中。
     // create internal watcher for the computed property.
     watchers[key] = new Watcher(vm, getter, noop, computedWatcherOptions)
 
@@ -220,6 +223,9 @@ function createComputedGetter (key) {
       if (watcher.dirty) {
         watcher.evaluate()
       }
+      //计算属性的getter这里是关键，依赖计算属性会创建一个外层的watcher，依赖着计算属性
+      //但是在获取计算属性的时候，计算属性不像data那样，它本身没有Dep，它就把计算属性的watch
+      //所有依赖的dep，都加上这个watch，也就是当这个计算属性依赖的state变化时，也触发外层的watch
       if (Dep.target) {
         watcher.depend()
       }
